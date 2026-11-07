@@ -1,6 +1,6 @@
 # Storefront E2E Tests
 
-![e2e](https://github.com/AntonVodolazskiy/test-task/actions/workflows/e2e.yml/badge.svg)
+![e2e](https://github.com/AntonVodolazskiy/storefront-e2e-selenium/actions/workflows/e2e.yml/badge.svg)
 
 UI automation for an online store using Java, Selenium WebDriver, and Cucumber with a BDD approach.
 
