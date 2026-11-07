@@ -8,30 +8,24 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.List;
 
 public class StorefrontPage {
     private static final Duration TIMEOUT = Duration.ofSeconds(10);
-    private static final By COOKIE_ACCEPT_BUTTON = By.id("CookieConsentIOAccept");
-    private static final By SEARCH_INPUT = By.xpath("//input[@type='search' or "
-            + "contains(translate(@placeholder, 'ZOEKEN', 'zoeken'), 'zoek') or "
-            + "contains(translate(@aria-label, 'ZOEKEN', 'zoeken'), 'zoek')]");
-    private static final By SEARCH_RESULTS = By.xpath("//a[.//img and "
-            + "(contains(@href, 'cadeau') or contains(@href, 'product'))]");
-    private static final By DIGITAL_FORMAT = By.cssSelector("label[for='digital']");
-    private static final By ADD_TO_CART = By.xpath("//*[self::button or @role='button']"
-            + "[contains(normalize-space(), 'winkelmandje') or contains(normalize-space(), 'Toevoegen')]");
-    private static final By NAME_INPUT = By.cssSelector("input[name='name']");
-    private static final By EMAIL_INPUT = By.cssSelector("input[name='email']");
-    private static final By CONFIRM_EMAIL_INPUT = By.cssSelector("input[name='confirmEmail']");
-    private static final By CART_BUTTON = By.xpath("//*[normalize-space()='In m’n winkelmandje']");
-    private static final By CHECKOUT_BUTTON = By.xpath("//*[normalize-space()='Veilig afrekenen']");
-    private static final By GUEST_CHECKOUT_BUTTON = By.xpath("//*[normalize-space()='Bestellen als gast']");
-    private static final By FIRST_NAME_INPUT = By.cssSelector("input[name='firstName']");
-    private static final By LAST_NAME_INPUT = By.cssSelector("input[name='lastName']");
-    private static final By PHONE_INPUT = By.cssSelector("input[name='phoneNumber']");
-    private static final By CONTINUE_BUTTON = By.xpath("//*[normalize-space()='Ga verder']");
-    private static final By PAYMENT_OPTIONS = By.cssSelector("input[type='radio'], [role='radio']");
+    private static final By USERNAME = By.id("user-name");
+    private static final By PASSWORD = By.id("password");
+    private static final By LOGIN_BUTTON = By.id("login-button");
+    private static final By LOGIN_ERROR = By.cssSelector("[data-test='error']");
+    private static final By INVENTORY_ITEMS = By.cssSelector(".inventory_item");
+    private static final By ADD_TO_CART = By.cssSelector(".inventory_item button[id^='add-to-cart']");
+    private static final By CART_BADGE = By.cssSelector(".shopping_cart_badge");
+    private static final By CART_LINK = By.cssSelector(".shopping_cart_link");
+    private static final By CHECKOUT_BUTTON = By.id("checkout");
+    private static final By FIRST_NAME = By.id("first-name");
+    private static final By LAST_NAME = By.id("last-name");
+    private static final By POSTAL_CODE = By.id("postal-code");
+    private static final By CONTINUE_BUTTON = By.id("continue");
+    private static final By FINISH_BUTTON = By.id("finish");
+    private static final By COMPLETE_HEADER = By.cssSelector(".complete-header");
 
     private final WebDriver driver;
     private final WebDriverWait wait;
@@ -43,64 +37,46 @@ public class StorefrontPage {
 
     public void open(String url) {
         driver.get(url);
-        wait.until(ExpectedConditions.jsReturnsValue("return document.readyState === 'complete'"));
-        Assertions.assertFalse(String.valueOf(driver.getTitle()).contains("Attention Required"),
-                "The storefront blocked the automated browser through Cloudflare.");
+        visible(LOGIN_BUTTON);
     }
 
-    public void acceptCookiesIfPresent() {
-        List<WebElement> buttons = driver.findElements(COOKIE_ACCEPT_BUTTON);
-        if (!buttons.isEmpty() && buttons.getFirst().isDisplayed()) {
-            click(COOKIE_ACCEPT_BUTTON);
-        }
+    public void logIn(String username, String password) {
+        type(USERNAME, username);
+        type(PASSWORD, password);
+        click(LOGIN_BUTTON);
     }
 
-    public void searchFor(String query) {
-        WebElement input = visible(SEARCH_INPUT);
-        input.clear();
-        input.sendKeys(query);
+    public void assertCatalogIsVisible() {
+        wait.until(ExpectedConditions.urlContains("inventory"));
+        Assertions.assertFalse(wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(INVENTORY_ITEMS)).isEmpty(),
+                "Expected the product catalog to list items.");
     }
 
-    public void assertSuggestionsAreVisible() {
-        Assertions.assertFalse(visibleElements(SEARCH_RESULTS).isEmpty(),
-                "Expected at least one search suggestion for the entered query.");
+    public void assertLoginError(String expected) {
+        Assertions.assertTrue(visible(LOGIN_ERROR).getText().contains(expected),
+                "Expected login error containing: " + expected);
     }
 
-    public void selectFirstSearchResult() {
-        visibleElements(SEARCH_RESULTS).getFirst().click();
-    }
-
-    public void addDigitalProductToCart() {
-        click(DIGITAL_FORMAT);
+    public void addFirstProductToCart() {
         click(ADD_TO_CART);
     }
 
-    public void completeCartDetails(String name, String email) {
-        type(NAME_INPUT, name);
-        type(EMAIL_INPUT, email);
-        type(CONFIRM_EMAIL_INPUT, email);
-        click(CART_BUTTON);
+    public void assertCartCount(int expected) {
+        Assertions.assertEquals(String.valueOf(expected), visible(CART_BADGE).getText());
     }
 
-    public void assertCartIsOpen() {
-        wait.until(ExpectedConditions.urlContains("winkelmandje"));
-        Assertions.assertTrue(String.valueOf(driver.getCurrentUrl()).contains("winkelmandje"),
-                "Expected the shopping-cart page to be open.");
-    }
-
-    public void continueAsGuest(String firstName, String lastName, String email, String phone) {
+    public void checkOut(String firstName, String lastName, String postalCode) {
+        click(CART_LINK);
         click(CHECKOUT_BUTTON);
-        click(GUEST_CHECKOUT_BUTTON);
-        type(FIRST_NAME_INPUT, firstName);
-        type(LAST_NAME_INPUT, lastName);
-        type(EMAIL_INPUT, email);
-        type(PHONE_INPUT, phone);
+        type(FIRST_NAME, firstName);
+        type(LAST_NAME, lastName);
+        type(POSTAL_CODE, postalCode);
         click(CONTINUE_BUTTON);
+        click(FINISH_BUTTON);
     }
 
-    public void assertPaymentOptionsAreVisible() {
-        Assertions.assertFalse(visibleElements(PAYMENT_OPTIONS).isEmpty(),
-                "Expected payment options to be displayed at checkout.");
+    public void assertOrderConfirmed() {
+        Assertions.assertEquals("Thank you for your order!", visible(COMPLETE_HEADER).getText());
     }
 
     private void type(By locator, String value) {
@@ -115,9 +91,5 @@ public class StorefrontPage {
 
     private WebElement visible(By locator) {
         return wait.until(ExpectedConditions.visibilityOfElementLocated(locator));
-    }
-
-    private List<WebElement> visibleElements(By locator) {
-        return wait.until(ExpectedConditions.visibilityOfAllElementsLocatedBy(locator));
     }
 }

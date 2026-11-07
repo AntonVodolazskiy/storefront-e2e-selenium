@@ -2,51 +2,52 @@ package e2e.steps;
 
 import e2e.pages.StorefrontPage;
 import e2e.support.WebDriverManager;
-import io.cucumber.java.en.And;
 import io.cucumber.java.en.Given;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 
 public class ShoppingFlowSteps {
-    private static final String BASE_URL = "https://www.cadeaubon.nl/";
+    private static final String BASE_URL = "https://www.saucedemo.com/";
     private StorefrontPage storefrontPage;
 
-    @Given("I am on the cadeaubon.nl website")
-    public void openStorefront() {
+    @Given("I am on the Sauce Demo login page")
+    public void openLoginPage() {
         storefrontPage = new StorefrontPage(WebDriverManager.getDriver());
         storefrontPage.open(BASE_URL);
-        storefrontPage.acceptCookiesIfPresent();
     }
 
-    @When("I start typing {string} in the search bar")
-    public void startTypingInSearchBar(String query) {
-        storefrontPage.searchFor(query);
+    @When("I log in as {string} with password {string}")
+    public void logIn(String username, String password) {
+        storefrontPage.logIn(username, password);
     }
 
-    @Then("I should see product suggestions in the result field")
-    public void verifyProductSuggestions() {
-        storefrontPage.assertSuggestionsAreVisible();
+    @Then("I should see the product catalog")
+    public void verifyCatalog() {
+        storefrontPage.assertCatalogIsVisible();
     }
 
-    @And("I select the first product from the search results")
-    public void selectFirstProduct() {
-        storefrontPage.selectFirstSearchResult();
+    @Then("I should see the login error {string}")
+    public void verifyLoginError(String message) {
+        storefrontPage.assertLoginError(message);
     }
 
-    @Then("I add the selected product to the cart")
-    public void addSelectedProductToCart() {
-        storefrontPage.addDigitalProductToCart();
-        storefrontPage.completeCartDetails("Test Customer", "test.automation@example.com");
-        storefrontPage.assertCartIsOpen();
+    @When("I add the first product to the cart")
+    public void addFirstProduct() {
+        storefrontPage.addFirstProductToCart();
     }
 
-    @And("I proceed to the checkout")
-    public void proceedToCheckout() {
-        storefrontPage.continueAsGuest("Test", "Customer", "test.automation@example.com", "0612345678");
+    @Then("the cart badge should show {int} item")
+    public void verifyCartBadge(int count) {
+        storefrontPage.assertCartCount(count);
     }
 
-    @Then("I enter my credit card data")
-    public void verifyPaymentStep() {
-        storefrontPage.assertPaymentOptionsAreVisible();
+    @When("I check out as {string} {string} with postal code {string}")
+    public void checkOut(String firstName, String lastName, String postalCode) {
+        storefrontPage.checkOut(firstName, lastName, postalCode);
+    }
+
+    @Then("I should see the order confirmation")
+    public void verifyConfirmation() {
+        storefrontPage.assertOrderConfirmed();
     }
 }

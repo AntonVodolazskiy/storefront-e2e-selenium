@@ -2,15 +2,16 @@
 
 ![e2e](https://github.com/AntonVodolazskiy/storefront-e2e-selenium/actions/workflows/e2e.yml/badge.svg)
 
-UI automation for an online store using Java, Selenium WebDriver, and Cucumber with a BDD approach.
+UI automation for an online store (Sauce Demo) using Java, Selenium WebDriver, and Cucumber with a BDD approach.
 
 ## What the Scenarios Cover
 
-Against the cadeaubon.nl storefront:
+Against the [Sauce Demo](https://www.saucedemo.com/) storefront, a public demo site built for test automation:
 
-1. **Search autocomplete** – typing in the search bar shows product suggestions.
-2. **Add to cart** – a product picked from the search results is added to the cart.
-3. **Checkout** – from the cart, proceed to checkout and fill in credit card data.
+1. **Login** – a valid user lands on the product catalog.
+2. **Locked-out user** – login is rejected with a clear error message.
+3. **Add to cart** – adding a product updates the cart badge.
+4. **Checkout** – a full purchase from cart to the "Thank you for your order!" confirmation.
 
 ## BDD Structure
 
