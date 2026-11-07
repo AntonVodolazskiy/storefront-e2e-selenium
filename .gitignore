@@ -1,2 +1,5 @@
-# Project exclude paths
-/storefront-e2e-tests/target/
+.idea/
+.vscode/
+target/
+*.iml
+.DS_Store

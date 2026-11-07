@@ -1,6 +1,16 @@
 # Storefront E2E Tests
 
+![e2e](https://github.com/AntonVodolazskiy/test-task/actions/workflows/e2e.yml/badge.svg)
+
 UI automation for an online store using Java, Selenium WebDriver, and Cucumber with a BDD approach.
+
+## What the Scenarios Cover
+
+Against the cadeaubon.nl storefront:
+
+1. **Search autocomplete** – typing in the search bar shows product suggestions.
+2. **Add to cart** – a product picked from the search results is added to the cart.
+3. **Checkout** – from the cart, proceed to checkout and fill in credit card data.
 
 ## BDD Structure
 
